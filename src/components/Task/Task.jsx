@@ -1,9 +1,38 @@
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import useCreateTaskMutation from "../../queries/useCreateTaskMutation";
 import { PageMode } from "../../utils/constants";
 import styles from "./Task.module.css";
-const Task = ({ mode, style, onClick, onSave, task, setTask, bgColor }) => {
+import useUpdateTaskMutation from "../../queries/useUpdateTaskMutation";
+
+const Task = ({ mode, style, taskProp, bgColor }) => {
+  const [task, setTask] = useState(taskProp);
+
   const taskStyle = {
     backgroundColor: bgColor || "antiquewhite",
   };
+
+  const queryClient = useQueryClient();
+
+  const onSuccess = (res) => {
+    setTask(taskProp);
+    queryClient.invalidateQueries("getPendingToDoTasks");
+    queryClient.invalidateQueries("getOverdueToDoTasks");
+  };
+  const onError = (res) => {
+    console.log(res);
+  };
+
+  const createTaskMutation = useCreateTaskMutation(onError, onSuccess);
+  const updateTaskMutation = useUpdateTaskMutation(onError, onSuccess);
+
+  const onSave = () => {
+    createTaskMutation.mutate(task);
+  };
+  const onEdit = () => {
+    updateTaskMutation.mutate(task);
+  };
+
   return (
     <>
       <div style={style} className={`${styles["task"]}`}>
@@ -53,14 +82,13 @@ const Task = ({ mode, style, onClick, onSave, task, setTask, bgColor }) => {
                 <input
                   className={`d-inline-block ${styles["border-and-margins"]} ${styles["task-checkbox"]}`}
                   type="checkbox"
+                  checked={task.isDone}
                   onChange={() =>
                     setTask((state) => ({ ...state, isDone: !state.isDone }))
                   }
                 />
                 <button
-                  onClick={() => {
-                    console.log(task);
-                  }}
+                  onClick={onEdit}
                   className={` d-inline-block ${styles["tick"]}`}
                 >
                   ✔

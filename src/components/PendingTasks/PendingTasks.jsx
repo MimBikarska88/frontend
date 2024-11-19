@@ -26,7 +26,7 @@ const PendingTasks = () => {
             <Task
               key={task.id}
               mode={PageMode.Edit}
-              task={task}
+              taskProp={task}
               bgColor={generatePendingToDoColor()}
             />
           ))
