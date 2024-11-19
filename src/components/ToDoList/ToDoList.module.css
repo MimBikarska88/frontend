@@ -1,0 +1,11 @@
+.tasks {
+  display: flex;
+  justify-content: space-around;
+  flex-direction: row;
+}
+.to-do-list {
+  width: "50%";
+}
+.task {
+  width: "50%";
+}
